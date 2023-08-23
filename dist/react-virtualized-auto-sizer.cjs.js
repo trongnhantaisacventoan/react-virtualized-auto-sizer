@@ -281,7 +281,7 @@ class AutoSizer extends react.Component {
   componentDidMount() {
     const {
       nonce,
-      externalWindow
+      externalwindow
     } = this.props;
     if (this._autoSizer && this._autoSizer.parentNode && this._autoSizer.parentNode.ownerDocument && this._autoSizer.parentNode.ownerDocument.defaultView && this._autoSizer.parentNode instanceof this._autoSizer.parentNode.ownerDocument.defaultView.HTMLElement) {
       // Delay access of parentNode until mount.
@@ -293,7 +293,12 @@ class AutoSizer extends react.Component {
       // See issue #41
       if (this._parentNode != null) {
         if (typeof ResizeObserver !== "undefined") {
-          this._resizeObserver = new ResizeObserver(() => {
+          this._resizeObserver = externalwindow ? new externalwindow.ResizeObserver(() => {
+            // Guard against "ResizeObserver loop limit exceeded" error;
+            // could be triggered if the state update causes the ResizeObserver handler to run long.
+            // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
+            this._timeoutId = setTimeout(this._onResize, 0);
+          }) : new ResizeObserver(() => {
             // Guard against "ResizeObserver loop limit exceeded" error;
             // could be triggered if the state update causes the ResizeObserver handler to run long.
             // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
@@ -304,17 +309,12 @@ class AutoSizer extends react.Component {
           this._detectElementResize = createDetectElementResize(nonce);
           this._detectElementResize.addResizeListener(this._parentNode, this._onResize);
         }
-        externalWindow?.addEventListener("resize", this._onResize);
         this._onResize();
       }
     }
   }
   componentWillUnmount() {
-    const {
-      externalWindow
-    } = this.props;
     if (this._parentNode) {
-      externalWindow?.removeEventListener("resize", this._onResize);
       if (this._detectElementResize) {
         this._detectElementResize.removeResizeListener(this._parentNode, this._onResize);
       }

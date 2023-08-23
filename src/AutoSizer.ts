@@ -28,7 +28,7 @@ export class AutoSizer extends Component<Props, State> {
   _timeoutId: number | null = null;
 
   componentDidMount() {
-    const { nonce, externalWindow } = this.props;
+    const { nonce, externalwindow } = this.props;
 
     if (
       this._autoSizer &&
@@ -47,12 +47,19 @@ export class AutoSizer extends Component<Props, State> {
       // See issue #41
       if (this._parentNode != null) {
         if (typeof ResizeObserver !== "undefined") {
-          this._resizeObserver = new ResizeObserver(() => {
-            // Guard against "ResizeObserver loop limit exceeded" error;
-            // could be triggered if the state update causes the ResizeObserver handler to run long.
-            // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
-            this._timeoutId = setTimeout(this._onResize, 0);
-          });
+          this._resizeObserver = externalwindow
+            ? new externalwindow.ResizeObserver(() => {
+                // Guard against "ResizeObserver loop limit exceeded" error;
+                // could be triggered if the state update causes the ResizeObserver handler to run long.
+                // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
+                this._timeoutId = setTimeout(this._onResize, 0);
+              })
+            : new ResizeObserver(() => {
+                // Guard against "ResizeObserver loop limit exceeded" error;
+                // could be triggered if the state update causes the ResizeObserver handler to run long.
+                // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
+                this._timeoutId = setTimeout(this._onResize, 0);
+              });
           this._resizeObserver.observe(this._parentNode);
         } else {
           this._detectElementResize = createDetectElementResize(nonce);
@@ -62,17 +69,13 @@ export class AutoSizer extends Component<Props, State> {
           );
         }
 
-        externalWindow?.addEventListener("resize", this._onResize);
-
         this._onResize();
       }
     }
   }
 
   componentWillUnmount() {
-    const { externalWindow } = this.props;
     if (this._parentNode) {
-      externalWindow?.removeEventListener("resize", this._onResize);
       if (this._detectElementResize) {
         this._detectElementResize.removeResizeListener(
           this._parentNode,
