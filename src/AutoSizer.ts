@@ -28,7 +28,7 @@ export class AutoSizer extends Component<Props, State> {
   _timeoutId: number | null = null;
 
   componentDidMount() {
-    const { nonce } = this.props;
+    const { nonce, myWindow } = this.props;
 
     if (
       this._autoSizer &&
@@ -62,13 +62,17 @@ export class AutoSizer extends Component<Props, State> {
           );
         }
 
+        myWindow?.addEventListener("resize", this._onResize);
+
         this._onResize();
       }
     }
   }
 
   componentWillUnmount() {
+    const { myWindow } = this.props;
     if (this._parentNode) {
+      myWindow?.removeEventListener("resize", this._onResize);
       if (this._detectElementResize) {
         this._detectElementResize.removeResizeListener(
           this._parentNode,
