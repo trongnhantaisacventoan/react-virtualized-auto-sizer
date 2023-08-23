@@ -277,7 +277,7 @@ class AutoSizer extends Component {
   componentDidMount() {
     const {
       nonce,
-      myWindow
+      externalWindow
     } = this.props;
     if (this._autoSizer && this._autoSizer.parentNode && this._autoSizer.parentNode.ownerDocument && this._autoSizer.parentNode.ownerDocument.defaultView && this._autoSizer.parentNode instanceof this._autoSizer.parentNode.ownerDocument.defaultView.HTMLElement) {
       // Delay access of parentNode until mount.
@@ -300,17 +300,17 @@ class AutoSizer extends Component {
           this._detectElementResize = createDetectElementResize(nonce);
           this._detectElementResize.addResizeListener(this._parentNode, this._onResize);
         }
-        myWindow?.addEventListener("resize", this._onResize);
+        externalWindow?.addEventListener("resize", this._onResize);
         this._onResize();
       }
     }
   }
   componentWillUnmount() {
     const {
-      myWindow
+      externalWindow
     } = this.props;
     if (this._parentNode) {
-      myWindow?.removeEventListener("resize", this._onResize);
+      externalWindow?.removeEventListener("resize", this._onResize);
       if (this._detectElementResize) {
         this._detectElementResize.removeResizeListener(this._parentNode, this._onResize);
       }
