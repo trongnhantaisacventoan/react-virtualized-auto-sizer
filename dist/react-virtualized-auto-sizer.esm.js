@@ -276,8 +276,7 @@ class AutoSizer extends Component {
   }
   componentDidMount() {
     const {
-      nonce,
-      externalwindow
+      nonce
     } = this.props;
     if (this._autoSizer && this._autoSizer.parentNode && this._autoSizer.parentNode.ownerDocument && this._autoSizer.parentNode.ownerDocument.defaultView && this._autoSizer.parentNode instanceof this._autoSizer.parentNode.ownerDocument.defaultView.HTMLElement) {
       // Delay access of parentNode until mount.
@@ -289,12 +288,7 @@ class AutoSizer extends Component {
       // See issue #41
       if (this._parentNode != null) {
         if (typeof ResizeObserver !== "undefined") {
-          this._resizeObserver = externalwindow ? new externalwindow.ResizeObserver(() => {
-            // Guard against "ResizeObserver loop limit exceeded" error;
-            // could be triggered if the state update causes the ResizeObserver handler to run long.
-            // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55
-            this._timeoutId = setTimeout(this._onResize, 0);
-          }) : new ResizeObserver(() => {
+          this._resizeObserver = new ResizeObserver(() => {
             // Guard against "ResizeObserver loop limit exceeded" error;
             // could be triggered if the state update causes the ResizeObserver handler to run long.
             // See https://github.com/bvaughn/react-virtualized-auto-sizer/issues/55

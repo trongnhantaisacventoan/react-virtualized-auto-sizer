@@ -11,7 +11,6 @@ export type Size = HorizontalSize & VerticalSize;
 type BaseProps = {
     nonce?: string;
     tagName?: string;
-    externalwindow?: Window;
 } & Omit<HTMLAttributes<HTMLDivElement>, "children" | "onResize">;
 export type HeightOnlyProps = BaseProps & {
     children: (size: VerticalSize) => ReactNode;
